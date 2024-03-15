@@ -14,6 +14,18 @@ Each member of the group has their own branch to work on and experiment on. Each
 
 ### Chris
 
+#### Experiement 1 (Model)
+RNN vs. SVM
+
+#### Experiment 2 (Paramters)
+Hyperparamter optimisation
+
+#### Experiment 3 (Loss Functions)
+Cross Entropy vs. L1
+
+#### Experiment 4 (Tokenization)
+tf-idf vs. word2vec
+
 ### Adam
 
 ### Paula
