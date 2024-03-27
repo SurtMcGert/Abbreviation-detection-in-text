@@ -16,17 +16,17 @@ Each member of the group has their own branch to work on and experiment on. Each
 
 HMM vs BERT
 
-#### Experiment 2 (Parameters)
+#### Experiment 2 (Tokenization)
 
-Hyperparameter optimisation
+Bag of Words vs Word2Vec
 
 #### Experiment 3 (Loss Functions)
 
 Cross Entropy vs MSE
 
-#### Experiment 4 (Tokenization)
+#### Experiment 4 (Parameters)
 
-Bag of Words vs Word2Vec
+Hyperparameter optimisation
 
 ### Chris
 
