@@ -1,5 +1,13 @@
 test.py
 test.ipynb
 bert-base-uncased-finetuned-ner
-hmm_model.dill
+*.dill
 __pycache__
+test_set_analysis
+train_set_analysis
+val_set_analysis
+tensorboards
+model_saves
+data-for-graphs
+save_plots.py
+plots

@@ -16,13 +16,15 @@ Each member of the group has their own branch to work on and experiment on. Each
 
 HMM vs BERT
 
-#### Experiment 2 (Tokenization)
+#### Experiment 2 (Loss Functions)
 
-Bag of Words vs Word2Vec
+Cross Entropy vs MLSML vs KLDiv vs MSE
 
-#### Experiment 3 (Loss Functions)
+#### Experiment 3 (Additional Training Samples from Optional Dataset)
 
-Cross Entropy vs MSE
+small dataset samples: 2144
+medium dataset samples: 11072
+large dataset samples: 51072
 
 #### Experiment 4 (Parameters)
 
