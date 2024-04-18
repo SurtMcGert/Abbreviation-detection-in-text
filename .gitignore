@@ -1,0 +1,11 @@
+data-for-graphs
+model_saves
+plots
+tensorboards
+test_set_analysis
+train_set_analysis
+val_set_analysis
+*.dill
+save_plots.py
+test.py
+test.ipynb
