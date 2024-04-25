@@ -11,3 +11,4 @@ model_saves
 data-for-graphs
 save_plots.py
 plots
+*.zip
