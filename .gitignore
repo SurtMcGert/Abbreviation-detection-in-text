@@ -10,3 +10,4 @@ save_plots.py
 test.py
 test.ipynb
 *.zip
+*.log
