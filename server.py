@@ -3,7 +3,6 @@ import logging.config
 
 import pandas as pd
 from flask import Flask, redirect, render_template, request, url_for
-from joblib import load
 from transformers import AutoModelForTokenClassification, pipeline
 from transformers.pipelines import PIPELINE_REGISTRY
 
@@ -18,7 +17,7 @@ LOGGING_CONFIG = {
     'formatters': {'default': {
         'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
     }},
-    'handlers': {
+        'handlers': {
         'file': {
             'class': 'logging.FileHandler',
             'filename': 'app.log',
@@ -86,6 +85,7 @@ def get_data():
         input = request.form['user-input']
         print(f"input: {input}")
 
+        app.logger.info(f"user-input: {input}")
         # Return `success` rout with user input parameter
         return redirect(url_for('success', input=input))
 
