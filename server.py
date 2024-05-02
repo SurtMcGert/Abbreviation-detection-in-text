@@ -4,6 +4,8 @@ from joblib import load
 from transformers import pipeline, AutoModelForTokenClassification
 from transformers.pipelines import PIPELINE_REGISTRY
 from pipeline import NER_Pipeline
+import datetime
+import logging
 
 pd.set_option('display.max_colwidth', 1000)
 
@@ -14,17 +16,34 @@ PIPELINE_REGISTRY.register_pipeline(
     pt_model=AutoModelForTokenClassification
 )
 
+# load the ner tagger pipeline
 ner_tagger = pipeline(
     "NER_NLP_tagger", model="SurtMcGert/NLP-group-CW-xlnet-ner-tagging")
 
 
 def requestResults(input):
+    """
+    function to get result from model
+    inputs:
+    - input - the text to pass to the model
+    """
     output = ner_tagger(input)
     return output
 
 
-# Boilerplate code from NLP-2023
+# setup the flask app
 app = Flask(__name__)
+
+
+def log(message, level=logging.INFO):
+    """
+    function to log a message
+    inputs:
+    - message - the message to log
+    - level - the logging level of the message
+    """
+    current_datetime = datetime.datetime.now()
+    app.logger.log(level, f"{current_datetime}: {message}")
 
 
 @app.route('/')
