@@ -17,7 +17,7 @@ LOGGING_CONFIG = {
     'formatters': {'default': {
         'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
     }},
-        'handlers': {
+    'handlers': {
         'file': {
             'class': 'logging.FileHandler',
             'filename': 'app.log',
@@ -55,20 +55,8 @@ def requestResults(input):
     - input - the text to pass to the model
     """
     output = ner_tagger(input)
+    app.logger.info(f"model-output: {output}")
     return output
-
-
-
-
-def log(message, level=logging.INFO):
-    """
-    function to log a message
-    inputs:
-    - message - the message to log
-    - level - the logging level of the message
-    """
-    current_datetime = datetime.datetime.now()
-    app.logger.log(level, f"{current_datetime}: {message}")
 
 
 @app.route('/')
@@ -80,7 +68,7 @@ def home():
 def get_data():
     if request.method == 'POST':
         input = request.form['user-input']
-        print(f"input: {input}")
+        app.logger.info(f"user-input: {input}")
         return redirect(url_for('success', input=input))
 
 
