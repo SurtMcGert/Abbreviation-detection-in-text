@@ -1,17 +1,17 @@
 import datetime
-import logging
-from logging.config import dictConfig
+import logging.config
 
 import pandas as pd
 from flask import Flask, redirect, render_template, request, url_for
-from joblib import load
 from transformers import AutoModelForTokenClassification, pipeline
 from transformers.pipelines import PIPELINE_REGISTRY
 
 from pipeline import NER_Pipeline
 
+# Truncate data frame at length 1000
 pd.set_option('display.max_colwidth', 1000)
 
+# Set up logger
 LOGGING_CONFIG = {
     'version': 1,
     'formatters': {'default': {
@@ -30,8 +30,20 @@ LOGGING_CONFIG = {
     }
 }
 
-# setup the flask app
+def log(message, level=logging.INFO):
+    """
+    function to log a message
+    inputs:
+    - message - the message to log
+    - level - the logging level of the message
+    """
+    current_datetime = datetime.datetime.now()
+    app.logger.log(level, f"{current_datetime}: {message}")
+
+# Set up Flask app
 app = Flask(__name__)
+
+# Create logger
 logging.config.dictConfig(LOGGING_CONFIG)
 app.logger.handlers = logging.getLogger().handlers
 
@@ -43,11 +55,12 @@ PIPELINE_REGISTRY.register_pipeline(
     pt_model=AutoModelForTokenClassification
 )
 
-# load the ner tagger pipeline
+# Load NER tagger pipeline
 ner_tagger = pipeline(
     "NER_NLP_tagger", model="SurtMcGert/NLP-group-CW-xlnet-ner-tagging")
 
 
+# Get predictions from pipeline
 def requestResults(input):
     """
     function to get result from model
@@ -58,34 +71,26 @@ def requestResults(input):
     return output
 
 
-
-
-def log(message, level=logging.INFO):
-    """
-    function to log a message
-    inputs:
-    - message - the message to log
-    - level - the logging level of the message
-    """
-    current_datetime = datetime.datetime.now()
-    app.logger.log(level, f"{current_datetime}: {message}")
-
-
+# Home path
 @app.route('/')
 def home():
     return render_template('index.html')
 
-
+# Home path method handling
 @app.route('/', methods=['POST', 'GET'])
 def get_data():
     if request.method == 'POST':
+        # Retrieve user input
         input = request.form['user-input']
         print(f"input: {input}")
+
+        # Return `success` rout with user input parameter
         return redirect(url_for('success', input=input))
 
-
+# `/success/<input>` route handling
 @app.route('/success/<input>')
 def success(input):
+    # Print results as HTML page
     return "<xmp>" + str(requestResults(input)) + " </xmp> "
 
 
