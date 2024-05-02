@@ -38,10 +38,9 @@ ner_tagger = pipeline(
     "NER_NLP_tagger", model="SurtMcGert/NLP-group-CW-xlnet-ner-tagging")
 
 
-def requestResults(kw):
-    data = ""
-    # pipeline.predict()
-    return data
+def requestResults(input):
+    output = ner_tagger(input)
+    return output
 
 
 # Boilerplate code from NLP-2023
@@ -50,19 +49,20 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('index.html')
 
 
 @app.route('/', methods=['POST', 'GET'])
 def get_data():
     if request.method == 'POST':
-        kw = request.form['search']
-        return redirect(url_for('success', kw=kw))
+        input = request.form['user-input']
+        print(f"input: {input}")
+        return redirect(url_for('success', input=input))
 
 
-@app.route('/success/<kw>')
-def success(kw):
-    return "<xmp>" + str(requestResults(kw)) + " </xmp> "
+@app.route('/success/<input>')
+def success(input):
+    return "<xmp>" + str(requestResults(input)) + " </xmp> "
 
 
 if __name__ == '__main__':
