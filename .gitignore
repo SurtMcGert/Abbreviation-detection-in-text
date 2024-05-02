@@ -9,3 +9,4 @@ val_set_analysis
 save_plots.py
 test.py
 test.ipynb
+*.zip

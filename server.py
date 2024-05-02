@@ -1,10 +1,21 @@
 import pandas as pd
 from flask import Flask, redirect, render_template, request, url_for
 from joblib import load
+from transformers import pipeline, AutoModelForTokenClassification
+from transformers.pipelines import PIPELINE_REGISTRY
+from pipeline import NER_Pipeline
 
 pd.set_option('display.max_colwidth', 1000)
 
-pipeline = load("text_classification.joblib")
+# Register custom pipeline
+PIPELINE_REGISTRY.register_pipeline(
+    "NER_NLP_tagger",
+    pipeline_class=NER_Pipeline,
+    pt_model=AutoModelForTokenClassification
+)
+
+ner_tagger = pipeline(
+    "NER_NLP_tagger", model="SurtMcGert/NLP-group-CW-xlnet-ner-tagging")
 
 
 def requestResults(kw):
