@@ -3,6 +3,7 @@ import logging.config
 
 import pandas as pd
 from flask import Flask, redirect, render_template, request, url_for
+from joblib import load
 from transformers import AutoModelForTokenClassification, pipeline
 from transformers.pipelines import PIPELINE_REGISTRY
 
@@ -17,7 +18,7 @@ LOGGING_CONFIG = {
     'formatters': {'default': {
         'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
     }},
-        'handlers': {
+    'handlers': {
         'file': {
             'class': 'logging.FileHandler',
             'filename': 'app.log',
@@ -68,6 +69,7 @@ def requestResults(input):
     - input - the text to pass to the model
     """
     output = ner_tagger(input)
+    app.logger.info(f"model-output: {output}")
     return output
 
 
