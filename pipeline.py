@@ -1,4 +1,5 @@
 from transformers import AutoModelForTokenClassification, TrainingArguments, Trainer, pipeline, Pipeline, AutoTokenizer
+from huggingface_hub import get_paths_info
 import torch
 import nltk
 from pre_processing import PreProcessInput
@@ -6,6 +7,12 @@ import spacy
 
 
 class NER_Pipeline(Pipeline):
+    def __init__(self, *args, **kwargs):
+        super(NER_Pipeline, self).__init__(*args, **kwargs)
+        self.model_name = kwargs["tokenizer"].name_or_path
+        self.MODEL_SHA = get_paths_info(
+            self.model_name, ["model.safetensors", "en"], repo_type="model")[0].lfs.sha256
+
     def _sanitize_parameters(self, **kwargs):
         preprocess_kwargs = {}
         if "text" in kwargs:
@@ -13,6 +20,14 @@ class NER_Pipeline(Pipeline):
         if "model_checkpoint" in kwargs:
             preprocess_kwargs["model_checkpoint"] = kwargs["model_checkpoint"]
         return preprocess_kwargs, {}, {}
+
+    def requires_update(self):
+        new_sha = get_paths_info(
+            self.model_name, ["model.safetensors", "en"], repo_type="model")[0].lfs.sha256
+        if (self.MODEL_SHA == new_sha):
+            return False
+        else:
+            return True
 
     def preprocess(self, text, model_checkpoint="bert-base-uncased"):
         # get the pos tags for the text

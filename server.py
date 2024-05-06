@@ -5,11 +5,12 @@ import pandas as pd
 from flask import Flask, redirect, render_template, request, url_for, logging as flog
 from transformers import AutoModelForTokenClassification, pipeline
 from transformers.pipelines import PIPELINE_REGISTRY
-
+import threading
+import time
 from pipeline import NER_Pipeline
 
-# Truncate data frame at length 1000
-pd.set_option('display.max_colwidth', 1000)
+
+UPDATE_AVAILABLE = False
 
 APP_LOGGING_CONFIG = {
     'version': 1,
@@ -53,7 +54,6 @@ APP_LOGGING_CONFIG = {
     }
 }
 
-
 # setup the flask app
 app = Flask(__name__)
 logging.config.dictConfig(APP_LOGGING_CONFIG)
@@ -72,6 +72,18 @@ PIPELINE_REGISTRY.register_pipeline(
 # Load NER tagger pipeline
 ner_tagger = pipeline(
     "NER_NLP_tagger", model="SurtMcGert/NLP-group-CW-roberta-ner-tagging")
+
+
+def model_update_checker(pipeline):
+    while UPDATE_AVAILABLE == False:
+        time.sleep(10)
+        UPDATE_AVAILABLE = pipeline.requires_update()
+
+
+model_update_checker_thread = threading.Thread(
+    target=model_update_checker, args=(ner_tagger,))
+
+model_update_checker_thread.start()
 
 
 def logIO(message):
