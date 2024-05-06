@@ -3,7 +3,6 @@ import logging.config
 
 import pandas as pd
 from flask import Flask, redirect, render_template, request, url_for, logging as flog
-from joblib import load100fcf2f7c8ba1ea333ec67cbaa93fbaaeea9cfe
 from transformers import AutoModelForTokenClassification, pipeline
 from transformers.pipelines import PIPELINE_REGISTRY
 
@@ -17,6 +16,9 @@ APP_LOGGING_CONFIG = {
     'formatters': {
         'default': {
             'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+        },
+        'io': {
+            'format': '[%(asctime)s]: %(message)s',
         }
     },
     'handlers': {
@@ -30,7 +32,7 @@ APP_LOGGING_CONFIG = {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': 'IO.log',
-            'formatter': 'default',
+            'formatter': 'io',
         }
     },
     'loggers': {
@@ -104,16 +106,10 @@ def get_data():
         # Retrieve user input
         input = request.form['user-input']
 
+        logIO(f"user-input: {input}")
 
-<< << << < HEAD
-logIO(f"user-input: {input}")
-== == == =
-print(f"input: {input}")
-
-app.logger.info(f"user-input: {input}")
-# Return `success` rout with user input parameter
->> >>>> > 100fcf2f7c8ba1ea333ec67cbaa93fbaaeea9cfe
-return redirect(url_for('success', input=input))
+    # Return `success` rout with user input parameter
+    return redirect(url_for('success', input=input))
 
 # `/success/<input>` route handling
 
