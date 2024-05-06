@@ -56,9 +56,13 @@ class NER_Pipeline(Pipeline):
         processed_ner_tags = [""] * len(self.inputs)
 
         for i, tag in enumerate(ner_tags):
-            original_token_index = self.tokenized_inputs.token_to_word(i)
-            if not original_token_index == None:
-                processed_ner_tags[original_token_index] = tag
+            try:
+                original_token_index = self.tokenized_inputs.token_to_word(
+                    i + 1)
+                if not original_token_index == None:
+                    processed_ner_tags[original_token_index] = tag
+            except:
+                pass
 
         # all_tokens = []
         # for token_id in self.model_inputs["input_ids"][0]:
