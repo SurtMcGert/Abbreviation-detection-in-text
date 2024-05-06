@@ -1,15 +1,15 @@
 import datetime
-import logging
-from logging.config import dictConfig
+import logging.config
 
 import pandas as pd
 from flask import Flask, redirect, render_template, request, url_for, logging as flog
-from joblib import load
+from joblib import load100fcf2f7c8ba1ea333ec67cbaa93fbaaeea9cfe
 from transformers import AutoModelForTokenClassification, pipeline
 from transformers.pipelines import PIPELINE_REGISTRY
 
 from pipeline import NER_Pipeline
 
+# Truncate data frame at length 1000
 pd.set_option('display.max_colwidth', 1000)
 
 APP_LOGGING_CONFIG = {
@@ -34,12 +34,12 @@ APP_LOGGING_CONFIG = {
         }
     },
     'loggers': {
-        'app': {  # Root logger
+        'app': {
             'handlers': ['app_file'],
             'level': 'INFO',  # Not strictly relevant in this scenario
             'propagate': False
         },
-        'io': {  # Root logger
+        'io': {
             'handlers': ['io_file'],
             'level': 'INFO',  # Not strictly relevant in this scenario
             'propagate': False
@@ -67,7 +67,7 @@ PIPELINE_REGISTRY.register_pipeline(
     pt_model=AutoModelForTokenClassification
 )
 
-# load the ner tagger pipeline
+# Load NER tagger pipeline
 ner_tagger = pipeline(
     "NER_NLP_tagger", model="SurtMcGert/NLP-group-CW-roberta-ner-tagging")
 
@@ -78,6 +78,7 @@ def logIO(message):
     app.logger = logging.getLogger("app")
 
 
+# Get predictions from pipeline
 def requestResults(input):
     """
     function to get result from model
@@ -89,21 +90,37 @@ def requestResults(input):
     return output
 
 
-@app.route('/')
+# Home path
+@ app.route('/')
 def home():
     return render_template('index.html')
 
+# Home path method handling
 
-@app.route('/', methods=['POST', 'GET'])
+
+@ app.route('/', methods=['POST', 'GET'])
 def get_data():
     if request.method == 'POST':
+        # Retrieve user input
         input = request.form['user-input']
-        logIO(f"user-input: {input}")
-        return redirect(url_for('success', input=input))
 
 
-@app.route('/success/<input>')
+<< << << < HEAD
+logIO(f"user-input: {input}")
+== == == =
+print(f"input: {input}")
+
+app.logger.info(f"user-input: {input}")
+# Return `success` rout with user input parameter
+>> >>>> > 100fcf2f7c8ba1ea333ec67cbaa93fbaaeea9cfe
+return redirect(url_for('success', input=input))
+
+# `/success/<input>` route handling
+
+
+@ app.route('/success/<input>')
 def success(input):
+    # Print results as HTML page
     return "<xmp>" + str(requestResults(input)) + " </xmp> "
 
 
