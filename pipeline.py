@@ -25,6 +25,8 @@ class NER_Pipeline(Pipeline):
             tokens.append(str(token))
             pos_tags.append(str(token.pos_))
 
+        self.inputs = tokens
+
         # pre-process the data
         processed_data = PreProcessInput.pre_process_data([tokens], [pos_tags])
 
@@ -32,14 +34,16 @@ class NER_Pipeline(Pipeline):
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_checkpoint, add_prefix_space=True)
         tokenized_inputs = self.tokenizer(
-            processed_data, truncation=True, is_split_into_words=True, return_tensors="pt")
+            processed_data, truncation=True, is_split_into_words=True)
+
+        self.tokenized_inputs = tokenized_inputs
 
         return tokenized_inputs
 
     def _forward(self, model_inputs):
         self.model_inputs = model_inputs
-        outputs = self.model(model_inputs["input_ids"],
-                             attention_mask=model_inputs["attention_mask"])
+        outputs = self.model(torch.tensor(model_inputs["input_ids"]),
+                             attention_mask=torch.tensor(model_inputs["attention_mask"]))
         return outputs
 
     def postprocess(self, model_outputs):
@@ -49,14 +53,20 @@ class NER_Pipeline(Pipeline):
 
         label_list = ['B-O', 'B-AC', 'B-LF', 'I-LF']
         ner_tags = [label_list[i] for i in logits]
+        processed_ner_tags = [""] * len(self.inputs)
 
-        all_tokens = []
-        for token_id in self.model_inputs["input_ids"][0]:
-            token = self.tokenizer.convert_ids_to_tokens(
-                [token_id], skip_special_tokens=False)[0]
-            all_tokens.append(token)
-        all_tokens = all_tokens[1:-1]
+        for i, tag in enumerate(ner_tags):
+            original_token_index = self.tokenized_inputs.token_to_word(i)
+            if not original_token_index == None:
+                processed_ner_tags[original_token_index] = tag
 
-        output = list(zip(all_tokens, ner_tags))
+        # all_tokens = []
+        # for token_id in self.model_inputs["input_ids"][0]:
+        #     token = self.tokenizer.convert_ids_to_tokens(
+        #         [token_id], skip_special_tokens=False)[0]
+        #     all_tokens.append(token)
+        # all_tokens = all_tokens[1:-1]
+
+        output = list(zip(self.inputs, processed_ner_tags))
 
         return output
