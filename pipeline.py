@@ -13,6 +13,10 @@ class NER_Pipeline(Pipeline):
         self.MODEL_SHA = get_paths_info(
             self.model_name, ["model.safetensors", "en"], repo_type="model")[0].lfs.sha256
 
+        # get the device
+        self.DEVICE = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu")
+
     def _sanitize_parameters(self, **kwargs):
         preprocess_kwargs = {}
         if "text" in kwargs:
@@ -29,7 +33,7 @@ class NER_Pipeline(Pipeline):
         else:
             return True
 
-    def preprocess(self, text, model_checkpoint="bert-base-uncased"):
+    def preprocess(self, text, model_checkpoint="roberta-base"):
         # get the pos tags for the text
         nlp = spacy.load("en_core_web_sm")
         tokens = []  # make a list for tokens
@@ -46,24 +50,28 @@ class NER_Pipeline(Pipeline):
         processed_data = PreProcessInput.pre_process_data([tokens], [pos_tags])
 
         # apply the BERT tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_checkpoint, add_prefix_space=True)
+        # self.tokenizer = AutoTokenizer.from_pretrained(
+        #     model_checkpoint, add_prefix_space=True)
         tokenized_inputs = self.tokenizer(
             processed_data, truncation=True, is_split_into_words=True)
 
         self.tokenized_inputs = tokenized_inputs
+        print(tokenized_inputs)
 
         return tokenized_inputs
 
     def _forward(self, model_inputs):
         self.model_inputs = model_inputs
-        outputs = self.model(torch.tensor(model_inputs["input_ids"]),
-                             attention_mask=torch.tensor(model_inputs["attention_mask"]))
+        self.model.to(self.DEVICE)
+        self.model.eval()
+        with torch.no_grad():
+            outputs = self.model(torch.tensor(model_inputs["input_ids"]).to(self.DEVICE),
+                                 attention_mask=torch.tensor(model_inputs["attention_mask"]).to(self.DEVICE))
         return outputs
 
     def postprocess(self, model_outputs):
         logits = model_outputs.logits.argmax(-1)
-        logits = logits[0].tolist()
+        logits = logits[0].cpu().tolist()
         logits = logits[1:-1]
 
         label_list = ['B-O', 'B-AC', 'B-LF', 'I-LF']
