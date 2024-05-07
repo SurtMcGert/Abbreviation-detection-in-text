@@ -1,14 +1,13 @@
-import datetime
 import logging.config
-
-import pandas as pd
-from flask import Flask, redirect, render_template, request, url_for, logging as flog
-from transformers import AutoModelForTokenClassification, pipeline, AutoTokenizer
+# from transformers import AutoModelForTokenClassification, pipeline, AutoTokenizer
+import transformers
 from transformers.pipelines import PIPELINE_REGISTRY
 import threading
 import time
 from pipeline import NER_Pipeline
 from queue import Queue
+import streamlit as st
+
 
 PROCESSING_REQUEST = False
 UPDATE_AVAILABLE = False
@@ -55,23 +54,19 @@ APP_LOGGING_CONFIG = {
     }
 }
 
-# setup the flask app
-app = Flask(__name__)
 logging.config.dictConfig(APP_LOGGING_CONFIG)
-app.logger.level = logging.INFO
-app.logger.propagate = True
-app.logger = logging.getLogger("app")
+logger = logging.getLogger("io")
 
 
 # Register custom pipeline
 PIPELINE_REGISTRY.register_pipeline(
     "NER_NLP_tagger",
     pipeline_class=NER_Pipeline,
-    pt_model=AutoModelForTokenClassification
+    pt_model=transformers.AutoModelForTokenClassification
 )
 
 # Load NER tagger pipeline
-ner_tagger = pipeline(
+ner_tagger = transformers.pipeline(
     "NER_NLP_tagger", model="SurtMcGert/NLP-group-CW-roberta-ner-tagging")
 
 
@@ -84,9 +79,9 @@ def model_update_checker(pipeline):
             time.sleep(10)
             UPDATE_AVAILABLE = pipeline.requires_update()
         # update model
-        model = AutoModelForTokenClassification.from_pretrained(
+        model = transformers.AutoModelForTokenClassification.from_pretrained(
             "SurtMcGert/NLP-group-CW-roberta-ner-tagging", force_download=True)
-        tokenizer = AutoTokenizer.from_pretrained(
+        tokenizer = transformers.AutoTokenizer.from_pretrained(
             "SurtMcGert/NLP-group-CW-roberta-ner-tagging")
         UPDATE_AVAILABLE = False
         while PROCESSING_REQUEST == True:
@@ -100,14 +95,9 @@ model_update_checker_thread = threading.Thread(
 
 model_update_checker_thread.start()
 
-
-def logIO(message):
-    app.logger = logging.getLogger("io")
-    app.logger.info(f"{message}")
-    app.logger = logging.getLogger("app")
-
-
 # Get predictions from pipeline
+
+
 def requestResults(input):
     """
     function to get result from model
@@ -115,48 +105,21 @@ def requestResults(input):
     - input - the text to pass to the model
     """
     output = ner_tagger(input)
-    logIO(f"model-output: {output}")
+    # logIO(f"model-output: {output}")
     return output
 
 
-@ app.before_request
-def before_request(*args):
-    global PROCESSING_REQUEST
+# Title and text display
+st.title("Natural Language Processing NER Tagger")
+
+# Input widget for user text
+user_input = st.text_input("Enter your text here: ")
+
+# Display entered text
+if user_input:
     PROCESSING_REQUEST = True
-
-
-@ app.after_request
-def after_request(response):
-    global PROCESSING_REQUEST
+    logger.info(user_input)
+    output = requestResults(user_input)
+    logger.info(output)
+    st.write(output)
     PROCESSING_REQUEST = False
-    return response
-
-
-# Home path
-@ app.route('/')
-def home():
-    return render_template('index.html')
-
-
-@ app.route('/', methods=['POST', 'GET'])
-def get_data():
-    if request.method == 'POST':
-        # Retrieve user input
-        input = request.form['user-input']
-
-        logIO(f"user-input: {input}")
-
-    # Return `success` rout with user input parameter
-    return redirect(url_for('success', input=input))
-
-# `/success/<input>` route handling
-
-
-@ app.route('/success/<input>')
-def success(input):
-    # Print results as HTML page
-    return "<xmp>" + str(requestResults(input)) + " </xmp> "
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
