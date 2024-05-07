@@ -110,8 +110,7 @@ def requestResults(input):
     return output
 
 
-# Title and text display
-st.title("Natural Language Processing NER Tagger")
+st.title("NLP NER Tagger")
 
 # Input widget for user text
 user_input = st.text_input("Enter your text here: ")
