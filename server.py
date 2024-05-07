@@ -3,13 +3,14 @@ import logging.config
 
 import pandas as pd
 from flask import Flask, redirect, render_template, request, url_for, logging as flog
-from transformers import AutoModelForTokenClassification, pipeline
+from transformers import AutoModelForTokenClassification, pipeline, AutoTokenizer
 from transformers.pipelines import PIPELINE_REGISTRY
 import threading
 import time
 from pipeline import NER_Pipeline
+from queue import Queue
 
-
+PROCESSING_REQUEST = False
 UPDATE_AVAILABLE = False
 
 APP_LOGGING_CONFIG = {
@@ -75,9 +76,23 @@ ner_tagger = pipeline(
 
 
 def model_update_checker(pipeline):
-    while UPDATE_AVAILABLE == False:
-        time.sleep(10)
-        UPDATE_AVAILABLE = pipeline.requires_update()
+    global UPDATE_AVAILABLE
+    global PROCESSING_REQUEST
+    global ner_tagger
+    while True:
+        while UPDATE_AVAILABLE == False:
+            time.sleep(10)
+            UPDATE_AVAILABLE = pipeline.requires_update()
+        # update model
+        model = AutoModelForTokenClassification.from_pretrained(
+            "SurtMcGert/NLP-group-CW-roberta-ner-tagging", force_download=True)
+        tokenizer = AutoTokenizer.from_pretrained(
+            "SurtMcGert/NLP-group-CW-roberta-ner-tagging")
+        UPDATE_AVAILABLE = False
+        while PROCESSING_REQUEST == True:
+            time.sleep(1)
+        ner_tagger = pipeline(
+            "NER_NLP_tagger", model=model, tokenizer=tokenizer)
 
 
 model_update_checker_thread = threading.Thread(
@@ -104,12 +119,23 @@ def requestResults(input):
     return output
 
 
+@ app.before_request
+def before_request(*args):
+    global PROCESSING_REQUEST
+    PROCESSING_REQUEST = True
+
+
+@ app.after_request
+def after_request(response):
+    global PROCESSING_REQUEST
+    PROCESSING_REQUEST = False
+    return response
+
+
 # Home path
 @ app.route('/')
 def home():
     return render_template('index.html')
-
-# Home path method handling
 
 
 @ app.route('/', methods=['POST', 'GET'])
