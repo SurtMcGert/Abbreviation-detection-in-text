@@ -7,6 +7,8 @@ import time
 from pipeline import NER_Pipeline
 from queue import Queue
 import streamlit as st
+from annotated_text import annotated_text
+from collections import Counter
 
 
 PROCESSING_REQUEST = False
@@ -105,7 +107,6 @@ def requestResults(input):
     - input - the text to pass to the model
     """
     output = ner_tagger(input)
-    # logIO(f"model-output: {output}")
     return output
 
 
@@ -121,5 +122,27 @@ if user_input:
     logger.info(user_input)
     output = requestResults(user_input)
     logger.info(output)
-    st.write(output)
+    # display the output from the model as highlighted text
+    st.markdown('#')
+    annotated_text(output)
+
+    st.markdown('#')
+    # Create two columns
+    col1, col2 = st.columns(2)
+
+    # count the number of each of the tags present
+    tag_counts = Counter([tag for _, tag in output])
+    # Display bar chart
+    with col1:
+        st.bar_chart(data=tag_counts)
+
+    # get a list of acronyms
+    acros = [word for word, tag in output if tag == "B-AC"]
+    # display table
+    with col2:
+        if len(acros) == 0:
+            st.write("There were no acronyms :(")
+        else:
+            st.write("All Detect Acronyms")
+            st.table(acros)
     PROCESSING_REQUEST = False
