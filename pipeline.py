@@ -56,7 +56,6 @@ class NER_Pipeline(Pipeline):
             processed_data, truncation=True, is_split_into_words=True)
 
         self.tokenized_inputs = tokenized_inputs
-        print(tokenized_inputs)
 
         return tokenized_inputs
 

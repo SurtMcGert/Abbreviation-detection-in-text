@@ -12,7 +12,8 @@ from collections import Counter, OrderedDict
 import pandas as pd
 import altair as alt
 import wikipediaapi
-
+import re
+import wikipedia
 
 PROCESSING_REQUEST = False
 UPDATE_AVAILABLE = False
@@ -175,13 +176,8 @@ def get_acronym_description(acronym):
     Returns:
         A string containing the short description retrieved from Wikipedia or None if not found.
     """
-    wiki_wiki = wikipediaapi.Wikipedia('NLP NER tagging', 'en')
-    page = wiki_wiki.page(acronym)
-    if page.exists():
-        summary = page.summary
-        return summary.split(". ")[0]
-    else:
-        return ""
+    summary = wikipedia.summary(acronym)
+    return re.split(r"[.?!]\s*", summary)[0]
 
 
 st.title("NLP NER Tagger")
