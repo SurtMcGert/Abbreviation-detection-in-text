@@ -176,8 +176,11 @@ def get_acronym_description(acronym):
     Returns:
         A string containing the short description retrieved from Wikipedia or None if not found.
     """
-    summary = wikipedia.summary(acronym)
-    return re.split(r"[.?!]\s*", summary)[0]
+    try:
+        summary = wikipedia.summary(acronym)
+        return re.split(r"[.?!]\s*", summary)[0]
+    except:
+        return ""
 
 
 st.title("NLP NER Tagger")
