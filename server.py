@@ -99,6 +99,7 @@ def model_update_checker(pipeline):
 
 model_update_checker_thread = threading.Thread(
     target=model_update_checker, args=(ner_tagger,))
+model_update_checker_thread.setDaemon(True)
 
 model_update_checker_thread.start()
 
