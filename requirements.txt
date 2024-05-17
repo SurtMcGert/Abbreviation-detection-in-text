@@ -14,6 +14,7 @@ colorama==0.4.6
 confection==0.1.4
 cymem==2.0.8
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
+exceptiongroup==1.2.1
 filelock==3.14.0
 Flask==3.0.3
 fsspec==2024.3.1
@@ -22,6 +23,7 @@ GitPython==3.1.43
 htbuilder==0.6.2
 huggingface-hub==0.23.0
 idna==3.7
+iniconfig==2.0.0
 intel-openmp==2021.4.0
 itsdangerous==2.2.0
 Jinja2==3.1.4
@@ -44,6 +46,7 @@ numpy==1.26.4
 packaging==24.0
 pandas==2.2.2
 pillow==10.3.0
+pluggy==1.5.0
 preshed==3.0.9
 protobuf==4.25.3
 pyarrow==16.0.0
@@ -51,6 +54,7 @@ pydantic==2.7.1
 pydantic_core==2.18.2
 pydeck==0.9.0
 Pygments==2.18.0
+pytest==8.2.0
 python-dateutil==2.9.0.post0
 pytz==2024.1
 PyYAML==6.0.1
@@ -76,6 +80,7 @@ tenacity==8.3.0
 thinc==8.2.3
 tokenizers==0.19.1
 toml==0.10.2
+tomli==2.0.1
 toolz==0.12.1
 torch==2.3.0
 torchvision==0.18.0
