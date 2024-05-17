@@ -106,7 +106,7 @@ model_update_checker_thread.start()
 # Get predictions from pipeline
 
 
-def requestResults(input):
+def request_results(input):
     """
     function to get result from model
     inputs:
@@ -116,7 +116,7 @@ def requestResults(input):
     return output
 
 
-def getAcronymsAndLongforms(inp):
+def get_acronyms_and_long_forms(inp):
     """
     function to get a list of the acronyms and longforms
     inputs:
