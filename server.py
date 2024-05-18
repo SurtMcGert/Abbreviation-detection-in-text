@@ -109,7 +109,8 @@ def model_update_checker(pipeline):
 
 model_update_checker_thread = threading.Thread(
     target=model_update_checker, args=(ner_tagger,))  # make a thread to run the model_update_checker function
-model_update_checker_thread.setDaemon(True)  # prevent thread hanging
+# model_update_checker_thread.setDaemon(True) # deprecated
+model_update_checker_thread.daemon = True   # prevent thread hanging
 
 model_update_checker_thread.start()  # begin the thread
 
@@ -223,16 +224,20 @@ user_input = st.text_input("Enter your text here: ")
 # Display entered text
 if user_input:
     PROCESSING_REQUEST = True
-    logger.info(user_input)
+    start_time = time.perf_counter()  # Record start time
     output = request_results(user_input)
-    logger.info(output)
+    end_time = time.perf_counter()  # Record end time
+    processing_time = end_time - start_time  # calculate processing time
+    # create a logging message with the input, output and processing time
+    message = f"<input>: {user_input}<end-input>, <output>: {output}<end-output>, <processing-time>: {processing_time:.4f}<end-processing-time>"
+    logger.info(message)  # log the message
+
+    st.markdown('#')  # empty space
     # display the output from the model as highlighted text
-    st.markdown('#')
     annotated_text(output)
 
-    st.markdown('#')
-    # Create two columns
-    col1, col2 = st.columns(2)
+    st.markdown('#')  # empty space
+    col1, col2 = st.columns(2)  # Create two columns
 
     # count the number of each of the tags present
     counts = {}

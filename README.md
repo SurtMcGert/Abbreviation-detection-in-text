@@ -12,6 +12,11 @@ Each member of the group has their own branch to work on and experiment on. Each
 
 ### Harry
 
+1. HMM vs BERT
+2. Loss function comparison
+3. added data samples
+4. hyperparameter tuning
+
 ### Chris
 
 ### Adam
