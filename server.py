@@ -93,8 +93,9 @@ def model_update_checker(pipeline):
         UPDATE_AVAILABLE = False
         while PROCESSING_REQUEST == True:
             time.sleep(1)
-        ner_tagger = pipeline(
+        ner_tagger = transformers.pipeline(
             "NER_NLP_tagger", model=model, tokenizer=tokenizer)
+        pipeline = ner_tagger
 
 
 model_update_checker_thread = threading.Thread(
@@ -121,48 +122,68 @@ def getAcronymsAndLongforms(inp):
     inputs:
     - input - the tokens and their NER tags
     """
-    acros = {}
-    last_was_acro = False
-    last_was_b_lf = False
-    last_was_i_lf = False
-    long_form_builder = ""
-    previous_acro = ""
+    acros = {}  # a dictionary to store the found acronyms and their long forms
+    last_was_acro = False  # was the last token an acronym
+    last_was_b_lf = False  # was the last token the beginning of a long form
+    last_was_i_lf = False  # was the last token inside a long form
+    long_form_builder = ""  # string to build the current long form
+    previous_acro = ""  # the last found acronym
+    # for each token and NER tag pair in the input
     for pair in inp:
+        # if token is an acronym
         if pair[1] == "B-AC":
-            last_was_acro = True
-            precious_acro = pair[0]
+            last_was_acro = True  # say that the last token was an acronym
+            last_was_i_lf = False  # say that the last token was not a long form
+            last_was_b_lf = False  # say that the last token was not the start of a long form
+            previous_acro = pair[0]  # set the last known acronym to be this
+            # if there is no long form currently built
             if long_form_builder == "":
                 try:
+                    # try to access this acronym to check if it is already stored in the dictionary
                     acros[pair[0]]
                 except:
+                    # if there is an error (indicating this acronym has not been added to the dictionary), set its long form to "no LF found"
                     acros[pair[0]] = "no LF found"
             else:
+                # otherwise there is a currently built long form
+                # add this acronym to the dictionary and set its value to the currently built long form
                 acros[pair[0]] = long_form_builder
-                long_form_builder = ""
+                long_form_builder = ""  # clear the long form
+        # else, if the token is the beginning of a long form
         elif pair[1] == "B-LF":
-            if last_was_acro == True or (last_was_acro == False & last_was_i_lf == False & last_was_b_lf == False):
-                last_was_acro = False
-                last_was_i_lf = False
-                last_was_b_lf = True
-                long_form_builder = pair[0]
+            # if the last token was either an acronym or neither an acronym or a long form
+            # if last_was_acro == True or (last_was_acro == False & last_was_i_lf == False & last_was_b_lf == False):
+            last_was_acro = False  # say that the last token was not an acronym
+            last_was_i_lf = False  # say that the last token was not a long form
+            last_was_b_lf = True  # say that the last token was the beginning of a long form
+            # start building the long form by adding this token to the start of the long form builder string
+            long_form_builder = pair[0]
+        # else, if the token is inside a long form
         elif pair[1] == "I-LF":
+            # if the last token was either the start of a long form or was inside of a long form
             if last_was_b_lf == True or last_was_i_lf == True:
-                last_was_acro = False
-                last_was_b_lf = False
-                last_was_i_lf = True
+                # add this token to the long form currently being built
                 long_form_builder += " " + pair[0]
+            last_was_acro = False  # say that the last token was not an acronym
+            last_was_b_lf = False  # say that the last token was not the start of a long form
+            last_was_i_lf = True  # say that the last token was inside a long form
+        # else, if the token is neither an acronym nor a long form
         elif pair[1] == "B-O":
+            # if the last token was inside a long form
             if last_was_i_lf == True:
-                last_was_acro = False
-                last_was_i_lf = False
-                last_was_b_lf = False
+                # if there is a previous acronym
                 if not previous_acro == "":
+                    # if that acronym doesnt have a long form
                     if acros[previous_acro] == "no LF found":
+                        # set the long form of this acronym to be the long form just built
                         acros[previous_acro] = long_form_builder
-                        long_form_builder = ""
-        output = {"Acronyms": list(acros.keys()),
-                  "Long Forms": list(acros.values())}
-
+                        long_form_builder = ""  # clear the long form
+            last_was_acro = False  # say that the last token was not an acronym
+            last_was_i_lf = False  # say that the last token was not inside a long form
+            last_was_b_lf = False  # say that the last token was not the beginning of a long form
+        # output a dictionary of acronyms and long forms
+    output = {"Acronyms": list(acros.keys()),
+              "Long Forms": list(acros.values())}
     return output
 
 
