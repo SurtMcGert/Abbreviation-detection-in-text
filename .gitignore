@@ -12,3 +12,4 @@ test.ipynb
 *.zip
 *.log
 venv/
+nlp_cw/*

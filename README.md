@@ -20,5 +20,9 @@ Each member of the group has their own branch to work on and experiment on. Each
 ### Chris
 
 ### Adam
+1. BERT vs RoBERTa vs XLNet
+2. No pre-processing vs lemmatization vs stemming
+3. Pre-trained model vs training from scratch vs LoRA fine-tuning
+4. Hyperparameter tuning
 
 ### Paula
