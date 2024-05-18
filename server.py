@@ -100,13 +100,14 @@ def model_update_checker(pipeline):
 
 model_update_checker_thread = threading.Thread(
     target=model_update_checker, args=(ner_tagger,))
+model_update_checker_thread.setDaemon(True)
 
 model_update_checker_thread.start()
 
 # Get predictions from pipeline
 
 
-def requestResults(input):
+def request_results(input):
     """
     function to get result from model
     inputs:
@@ -116,7 +117,7 @@ def requestResults(input):
     return output
 
 
-def getAcronymsAndLongforms(inp):
+def get_acronyms_and_long_forms(inp):
     """
     function to get a list of the acronyms and longforms
     inputs:
@@ -213,7 +214,7 @@ user_input = st.text_input("Enter your text here: ")
 if user_input:
     PROCESSING_REQUEST = True
     logger.info(user_input)
-    output = requestResults(user_input)
+    output = request_results(user_input)
     logger.info(output)
     # display the output from the model as highlighted text
     st.markdown('#')
@@ -238,7 +239,7 @@ if user_input:
         st.bar_chart(tag_counts)
 
     # get a list of acronyms and their longforms
-    acros = getAcronymsAndLongforms(output)
+    acros = get_acronyms_and_long_forms(output)
     descriptions = []
     # get a short description of each
     for lf in acros["Long Forms"]:
