@@ -78,33 +78,40 @@ ner_tagger = transformers.pipeline(
 
 
 def model_update_checker(pipeline):
+    """
+    function for the model update thread to run
+    inputs:
+    pipeline - the models pipeline
+    """
     global UPDATE_AVAILABLE
     global PROCESSING_REQUEST
     global ner_tagger
+    # loop infinitely
     while True:
+        # while there is no update available
         while UPDATE_AVAILABLE == False:
             time.sleep(10)
+            # check if the pipeline requires an update
             UPDATE_AVAILABLE = pipeline.requires_update()
         # update model
         model = transformers.AutoModelForTokenClassification.from_pretrained(
             "SurtMcGert/NLP-group-CW-roberta-ner-tagging", force_download=True)
         tokenizer = transformers.AutoTokenizer.from_pretrained(
             "SurtMcGert/NLP-group-CW-roberta-ner-tagging")
-        UPDATE_AVAILABLE = False
+        # wait for the server to finish processing requests
         while PROCESSING_REQUEST == True:
             time.sleep(1)
         ner_tagger = transformers.pipeline(
-            "NER_NLP_tagger", model=model, tokenizer=tokenizer)
+            "NER_NLP_tagger", model=model, tokenizer=tokenizer)  # set the new pipeline with the new model and tokenizer
         pipeline = ner_tagger
+        UPDATE_AVAILABLE = False  # declare the update finished
 
 
 model_update_checker_thread = threading.Thread(
-    target=model_update_checker, args=(ner_tagger,))
-model_update_checker_thread.setDaemon(True)
+    target=model_update_checker, args=(ner_tagger,))  # make a thread to run the model_update_checker function
+model_update_checker_thread.setDaemon(True)  # prevent thread hanging
 
-model_update_checker_thread.start()
-
-# Get predictions from pipeline
+model_update_checker_thread.start()  # begin the thread
 
 
 def request_results(input):
@@ -199,12 +206,15 @@ def get_acronym_description(acronym):
         A string containing the short description retrieved from Wikipedia or None if not found.
     """
     try:
+        # search for the acronym in wikipedia
         summary = wikipedia.summary(acronym)
+        # get the first sentence of the summary
         return re.split(r"[.?!]\s*", summary)[0]
     except:
         return ""
 
 
+# set the title of the site
 st.title("NLP NER Tagger")
 
 # Input widget for user text
