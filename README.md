@@ -11,13 +11,16 @@ This work was done using the PLOD dataset found at https://github.com/surrey-nlp
 Each member of the group has their own branch to work on and experiment on. Each member's experiments are detailed below.
 
 ### Harry
-
 1. HMM vs BERT
 2. Loss function comparison
-3. added data samples
-4. hyperparameter tuning
+3. Added data samples
+4. Hyperparameter tuning
 
 ### Chris
+1. Stop word removal, stemming, converting to lower case, lemmatization, oversampling and undersampling
+2. tf-idf vs Word2Vec vs GloVe
+3. Hinge loss vs Squared Hinge loss vs Perceptron loss vs Modified Huber loss
+4. Hyperparameter tuning
 
 ### Adam
 1. BERT vs RoBERTa vs XLNet
