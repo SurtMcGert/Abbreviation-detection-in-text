@@ -29,3 +29,7 @@ Each member of the group has their own branch to work on and experiment on. Each
 4. Hyperparameter tuning
 
 ### Paula
+1. CRF vs BERT
+2. Focal Loss vs Weighted Cross Entropy Loss
+3. Bag of Words vs Word2Vec
+4.  Hyperparameter tuning 
