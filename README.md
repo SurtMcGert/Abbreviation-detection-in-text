@@ -33,3 +33,9 @@ Each member of the group has their own branch to work on and experiment on. Each
 2. Focal Loss vs Weighted Cross Entropy Loss
 3. Bag of Words vs Word2Vec
 4.  Hyperparameter tuning 
+
+## Usage
+1. Run the first cell to install requirements
+2. Run the second sell to import dependencies
+3. Scroll down to the server cell, and run it to deploy the Streamlit server
+
